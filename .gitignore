@@ -26,13 +26,6 @@ train/
 valid/
 test/
 
-# Output Files dari Script
-model_comparison_results.csv
-model_comparison_charts.png
-*.png
-*.jpg
-*.jpeg
-
 # Python
 __pycache__/
 *.py[cod]
