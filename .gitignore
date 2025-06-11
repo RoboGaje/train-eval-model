@@ -1,0 +1,143 @@
+# YOLO Model Files
+*.pt
+*.onnx
+*.engine
+*.torchscript
+
+# Pre-trained Base Models
+yolo12n.pt
+yolo12s.pt
+yolo12m.pt
+yolo12l.pt
+yolo12x.pt
+yolo11*.pt
+yolo8*.pt
+yolov*.pt
+
+# Training Results and Runs
+runs/
+wandb/
+*.log
+
+# Dataset Images (jika terlalu besar)
+# Uncomment jika ingin mengabaikan dataset
+train/images/
+valid/images/
+test/images/
+train/labels/
+valid/labels/
+test/labels/
+
+# Output Files dari Script
+model_comparison_results.csv
+model_comparison_charts.png
+*.png
+*.jpg
+*.jpeg
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# Conda Environment
+.conda/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Tensorboard logs
+logs/
+*.tfevents.*
+
+# Weights & Biases
+wandb/
+
+# MLflow
+mlruns/
+
+# Large temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Roboflow dataset (jika didownload ulang)
+# README.dataset.txt
+# README.roboflow.txt
+
+# Backup files
+*.bak
+*.backup 
