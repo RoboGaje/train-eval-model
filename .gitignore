@@ -13,6 +13,7 @@ yolo12x.pt
 yolo11*.pt
 yolo8*.pt
 yolov*.pt
+*.pt
 
 # Training Results and Runs
 runs/
@@ -21,12 +22,9 @@ wandb/
 
 # Dataset Images (jika terlalu besar)
 # Uncomment jika ingin mengabaikan dataset
-train/images/
-valid/images/
-test/images/
-train/labels/
-valid/labels/
-test/labels/
+train/
+valid/
+test/
 
 # Output Files dari Script
 model_comparison_results.csv
