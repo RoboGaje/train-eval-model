@@ -49,8 +49,8 @@ Sistem face recognition hybrid yang menggabungkan:
 ```bash
 python facenet_yolo_inference.py \
   --yolo-model models/YOLO12n/weights/best.pt \
-  --facenet-model facenet_models/best_facenet.pth \
-  --mapping facenet_models/class_mapping.pkl \
+  --facenet-model models/facenet_models/best_facenet.pth \
+  --mapping models/facenet_models/class_mapping.pkl \
   --mode image \
   --input test_image.jpg \
   --output result.jpg
@@ -60,8 +60,8 @@ python facenet_yolo_inference.py \
 ```bash
 python facenet_yolo_inference.py \
   --yolo-model models/YOLO12n/weights/best.pt \
-  --facenet-model facenet_models/best_facenet.pth \
-  --mapping facenet_models/class_mapping.pkl \
+  --facenet-model models/facenet_models/best_facenet.pth \
+  --mapping models/facenet_models/class_mapping.pkl \
   --mode video \
   --input video.mp4 \
   --output result.mp4 \
@@ -75,8 +75,8 @@ python facenet_yolo_inference.py \
 ```bash
 python facenet_yolo_inference.py \
   --yolo-model models/YOLO12n/weights/best.pt \
-  --facenet-model facenet_models/best_facenet.pth \
-  --mapping facenet_models/class_mapping.pkl \
+  --facenet-model models/facenet_models/best_facenet.pth \
+  --mapping models/facenet_models/class_mapping.pkl \
   --mode video \
   --input video.mp4 \
   --output result_hq.mp4 \

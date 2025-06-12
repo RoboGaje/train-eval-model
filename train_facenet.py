@@ -126,7 +126,7 @@ class FaceNetDataset(Dataset):
         return image, label
 
 class FaceNetTrainer:
-    def __init__(self, dataset_dir, model_save_dir='facenet_models', device=None):
+    def __init__(self, dataset_dir, model_save_dir='models/facenet_models', device=None):
         """
         Initialize FaceNet trainer
         
@@ -839,11 +839,11 @@ class FaceNetTrainer:
                 f.write(f"  Avg Faces/Image: {total_faces/total_images:.2f}\n\n")
             
             f.write("📁 OUTPUT FILES:\n")
-            f.write(f"  Models: facenet_models/\n")
-            f.write(f"  Test Results: facenet_models/test_results/\n")
-            f.write(f"  Training Curves: facenet_models/training_curves.png\n")
-            f.write(f"  Confusion Matrix: facenet_models/confusion_matrix_test.png\n")
-            f.write(f"  Class Accuracy: facenet_models/class_accuracy_test.png\n")
+            f.write(f"  Models: models/facenet_models/\n")
+            f.write(f"  Test Results: models/facenet_models/test_results/\n")
+            f.write(f"  Training Curves: models/facenet_models/training_curves.png\n")
+            f.write(f"  Confusion Matrix: models/facenet_models/confusion_matrix_test.png\n")
+            f.write(f"  Class Accuracy: models/facenet_models/class_accuracy_test.png\n")
         
         print(f"📋 Final evaluation summary saved: {summary_file}")
 
@@ -853,7 +853,7 @@ def main():
     
     parser = argparse.ArgumentParser(description='Fine-tune FaceNet untuk face recognition')
     parser.add_argument('--dataset', default='facenet_dataset', help='Path ke dataset yang sudah dipreprocess')
-    parser.add_argument('--output', default='facenet_models', help='Output directory untuk model')
+    parser.add_argument('--output', default='models/facenet_models', help='Output directory untuk model')
     parser.add_argument('--epochs', type=int, default=None, help=f'Number of training epochs (default: {EPOCHS})')
     parser.add_argument('--batch-size', type=int, default=None, help=f'Batch size (default: {BATCH_SIZE})')
     parser.add_argument('--lr', type=float, default=None, help=f'Learning rate (default: {LEARNING_RATE})')
@@ -916,7 +916,7 @@ def main():
         print(f"\n🎯 Training Summary:")
         print(f"   📊 Best Validation Accuracy: {best_accuracy:.2f}%")
         print(f"   💾 Models saved in: {args.output}")
-        print(f"   📈 Training curves: {args.output}/training_curves.png")
+        print(f"   �� Training curves: {args.output}/training_curves.png")
         
     except RuntimeError as e:
         print(f"❌ Error: {e}")

@@ -435,7 +435,7 @@ def main():
     parser.add_argument('--use-tensorrt', action='store_true', help='Gunakan TensorRT engine untuk YOLO')
 
     # Contoh penggunaan:
-    # python facenet_yolo_inference.py --yolo-model models/best.pt --facenet-model facenet_models/best_facenet.pth --mapping facenet_models/class_mapping.pkl --mode video --input video.mp4 --output result.mp4
+    # python facenet_yolo_inference.py --yolo-model models/best.pt --facenet-model models/facenet_models/best_facenet.pth --mapping models/facenet_models/class_mapping.pkl --mode video --input video.mp4 --output result.mp4
     
     args = parser.parse_args()
     
