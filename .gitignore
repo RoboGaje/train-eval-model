@@ -140,3 +140,5 @@ tmp/
 *.wmv
 
 facenet_dataset/
+
+*.pth

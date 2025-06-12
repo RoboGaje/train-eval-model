@@ -75,39 +75,87 @@ class FaceNetInference:
         print("✅ FaceNet inference initialized")
     
     def load_model(self):
-        """Load trained model"""
+        """Load trained FaceNet model"""
         checkpoint = torch.load(self.model_path, map_location=self.device)
         
         self.num_classes = checkpoint['num_classes']
         
-        # Initialize model with new structure
-        if 'backbone_state_dict' in checkpoint:
-            # New structure: backbone + classifier
-            self.backbone = InceptionResnetV1(pretrained=None, classify=False)
-            self.classifier = nn.Sequential(
-                nn.Dropout(0.5),
-                nn.Linear(512, 256),
-                nn.ReLU(),
-                nn.Dropout(0.3),
-                nn.Linear(256, self.num_classes)
-            )
-            
-            # Load weights
-            self.backbone.load_state_dict(checkpoint['backbone_state_dict'])
-            self.classifier.load_state_dict(checkpoint['classifier_state_dict'])
-            
-            # Combine for inference
-            self.model = nn.Sequential(self.backbone, self.classifier)
-        else:
-            # Old structure: single model
-            self.model = InceptionResnetV1(pretrained=None, classify=True, num_classes=self.num_classes)
-            self.model.logits = nn.Linear(self.model.last_linear.in_features, self.num_classes)
-            self.model.load_state_dict(checkpoint['model_state_dict'])
+        # Initialize model dengan struktur yang sama seperti training
+        # Backbone: InceptionResnetV1 untuk feature extraction
+        self.backbone = InceptionResnetV1(pretrained=None, classify=False)
         
+        # Classifier: Custom classifier layers
+        self.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, self.num_classes)
+        )
+        
+        # Load weights berdasarkan struktur checkpoint
+        if 'backbone_state_dict' in checkpoint and 'classifier_state_dict' in checkpoint:
+            # Load dari backbone dan classifier terpisah
+            backbone_state_dict = checkpoint['backbone_state_dict']
+            
+            # Filter out logits keys yang tidak diinginkan dari backbone
+            filtered_backbone_dict = {}
+            for key, value in backbone_state_dict.items():
+                if not key.startswith('logits.'):
+                    filtered_backbone_dict[key] = value
+            
+            self.backbone.load_state_dict(filtered_backbone_dict)
+            self.classifier.load_state_dict(checkpoint['classifier_state_dict'])
+            print("✅ Loaded model from separate backbone and classifier state dicts")
+            
+        elif 'model_state_dict' in checkpoint:
+            # Load dari model_state_dict yang berisi Sequential model
+            combined_model = nn.Sequential(self.backbone, self.classifier)
+            
+            try:
+                combined_model.load_state_dict(checkpoint['model_state_dict'])
+                print("✅ Loaded model from combined model state dict")
+            except Exception as e:
+                print(f"❌ Error loading combined model: {e}")
+                # Coba load manual dengan mapping keys
+                self._load_model_manual_mapping(checkpoint['model_state_dict'])
+        else:
+            raise ValueError("❌ Model checkpoint tidak memiliki state_dict yang valid")
+        
+        # Combine backbone dan classifier untuk inference
+        self.model = nn.Sequential(self.backbone, self.classifier)
         self.model = self.model.to(self.device)
         self.model.eval()
         
-        print(f"🤖 Model loaded: {self.num_classes} classes, accuracy: {checkpoint.get('accuracy', 'N/A'):.2f}%")
+        accuracy = checkpoint.get('accuracy', 0)
+        print(f"🤖 Model loaded successfully!")
+        print(f"   📊 Classes: {self.num_classes}")
+        print(f"   🎯 Accuracy: {accuracy:.2f}%")
+    
+    def _load_model_manual_mapping(self, state_dict):
+        """Manual mapping untuk load model jika ada masalah struktur"""
+        print("🔧 Attempting manual model loading...")
+        
+        # Separate backbone and classifier weights
+        backbone_dict = {}
+        classifier_dict = {}
+        
+        for key, value in state_dict.items():
+            if key.startswith('0.'):  # Backbone weights (index 0 in Sequential)
+                new_key = key[2:]  # Remove '0.' prefix
+                backbone_dict[new_key] = value
+            elif key.startswith('1.'):  # Classifier weights (index 1 in Sequential)
+                new_key = key[2:]  # Remove '1.' prefix
+                classifier_dict[new_key] = value
+        
+        # Load weights
+        if backbone_dict:
+            self.backbone.load_state_dict(backbone_dict)
+            print("✅ Backbone weights loaded manually")
+        
+        if classifier_dict:
+            self.classifier.load_state_dict(classifier_dict)
+            print("✅ Classifier weights loaded manually")
     
     def load_class_mapping(self, mapping_path):
         """Load class mapping"""
@@ -133,22 +181,43 @@ class FaceNetInference:
         if isinstance(image, np.ndarray):
             # Convert BGR to RGB if needed
             if len(image.shape) == 3 and image.shape[2] == 3:
-                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-            image = Image.fromarray(image)
+                image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            else:
+                image_rgb = image
+            pil_image = Image.fromarray(image_rgb)
+        else:
+            pil_image = image
+            image_rgb = np.array(image)
         
         # Detect faces
-        boxes, probs = self.mtcnn.detect(image)
+        boxes, probs = self.mtcnn.detect(pil_image)
         
         results = []
         
         if boxes is not None:
             for box, prob in zip(boxes, probs):
                 if prob > 0.9:  # Face detection confidence
-                    # Crop face
-                    face = self.mtcnn.extract(image, [box], save_path=None)
+                    # Crop face manually instead of using mtcnn.extract
+                    x1, y1, x2, y2 = box.astype(int)
                     
-                    if face is not None and len(face) > 0:
-                        face_tensor = face[0].unsqueeze(0).to(self.device)
+                    # Add some padding
+                    padding = 20
+                    h, w = image_rgb.shape[:2]
+                    x1 = max(0, x1 - padding)
+                    y1 = max(0, y1 - padding)
+                    x2 = min(w, x2 + padding)
+                    y2 = min(h, y2 + padding)
+                    
+                    # Crop face
+                    face_crop = image_rgb[y1:y2, x1:x2]
+                    
+                    if face_crop.size > 0:
+                        # Convert to PIL and resize
+                        face_pil = Image.fromarray(face_crop)
+                        face_pil = face_pil.resize((160, 160))
+                        
+                        # Convert to tensor
+                        face_tensor = self.transform(face_pil).unsqueeze(0).to(self.device)
                         
                         # Recognize face
                         with torch.no_grad():
@@ -414,6 +483,9 @@ def main():
     parser.add_argument('--confidence', type=float, default=0.7, help='Confidence threshold')
     parser.add_argument('--show', action='store_true', help='Tampilkan hasil')
     parser.add_argument('--device', help='Device untuk inference (cuda/cpu)')
+
+    # Contoh: 
+    # python facenet_inference.py --model facenet_models/best_facenet.pth --mapping facenet_models/class_mapping.pkl --mode video --input WIN_20250612_17_21_33_Pro.mp4 --output video_1_output.mp4 
     
     args = parser.parse_args()
     
