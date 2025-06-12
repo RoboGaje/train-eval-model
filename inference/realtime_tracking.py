@@ -20,23 +20,23 @@ warnings.filterwarnings('ignore')
 # Konfigurasi model yang tersedia
 AVAILABLE_MODELS = {
     'yolov12n': {
-        'pytorch': 'models/YOLO12n/weights/best.pt',
-        'tensorrt': 'models/YOLO12n/weights/best.engine'
+        'pytorch': '../models/YOLO12n/weights/best.pt',
+        'tensorrt': '../models/YOLO12n/weights/best.engine'
     },
     'yolov12s': {
-        'pytorch': 'models/YOLO12s/weights/best.pt',
+        'pytorch': '../models/YOLO12s/weights/best.pt',
         'tensorrt': None  # Belum ada TensorRT untuk YOLOv12s
     },
     'yolov12m': {
-        'pytorch': 'models/YOLOv12m/weights/best.pt',
+        'pytorch': '../models/YOLOv12m/weights/best.pt',
         'tensorrt': None
     },
     'yolov12l': {
-        'pytorch': 'models/YOLOv12l/weights/best.pt',
+        'pytorch': '../models/YOLOv12l/weights/best.pt',
         'tensorrt': None
     },
     'yolov12x': {
-        'pytorch': 'models/YOLOv12x/weights/best.pt',
+        'pytorch': '../models/YOLOv12x/weights/best.pt',
         'tensorrt': None
     }
 }

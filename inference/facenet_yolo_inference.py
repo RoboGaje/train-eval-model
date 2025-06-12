@@ -434,8 +434,8 @@ def main():
     parser.add_argument('--device', help='Device untuk inference (cuda/cpu)')
     parser.add_argument('--use-tensorrt', action='store_true', help='Gunakan TensorRT engine untuk YOLO')
 
-    # Contoh penggunaan:
-    # python facenet_yolo_inference.py --yolo-model models/best.pt --facenet-model models/facenet_models/best_facenet.pth --mapping models/facenet_models/class_mapping.pkl --mode video --input video.mp4 --output result.mp4
+    # Contoh penggunaan dari direktori inference:
+    # python facenet_yolo_inference.py --yolo-model ../models/YOLO12n/weights/best.pt --facenet-model ../models/facenet_models/latest/best_facenet.pth --mapping ../models/facenet_models/latest/class_mapping.pkl --mode video --input ../WIN_20250612_17_21_33_Pro.mp4 --output ../result.mp4 --use-tensorrt
     
     args = parser.parse_args()
     

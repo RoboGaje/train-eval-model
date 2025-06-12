@@ -484,8 +484,8 @@ def main():
     parser.add_argument('--show', action='store_true', help='Tampilkan hasil')
     parser.add_argument('--device', help='Device untuk inference (cuda/cpu)')
 
-    # Contoh: 
-    # python facenet_inference.py --model models/facenet_models/best_facenet.pth --mapping models/facenet_models/class_mapping.pkl --mode video --input WIN_20250612_17_21_33_Pro.mp4 --output video_1_output.mp4
+    # Contoh penggunaan dari direktori inference: 
+    # python facenet_inference.py --model ../models/facenet_models/latest/best_facenet.pth --mapping ../models/facenet_models/latest/class_mapping.pkl --mode video --input ../WIN_20250612_17_21_33_Pro.mp4 --output ../video_1_output.mp4
     
     args = parser.parse_args()
     

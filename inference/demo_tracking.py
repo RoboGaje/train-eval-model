@@ -13,63 +13,59 @@ from ultralytics import YOLO
 import argparse
 
 def demo_with_test_images():
-    """Demo menggunakan gambar dari folder test - export ke file"""
-    print("🖼️  Demo dengan test images...")
+    """Demo dengan gambar-gambar test"""
+    print("🖼️  Demo dengan test images")
     
-    # Load model (default PyTorch)
-    model = YOLO('models/YOLO12n/weights/best.pt')
-    print("✅ Model loaded: YOLOv12n PyTorch")
+    # Load model
+    model = YOLO('../models/YOLO12n/weights/best.pt')
+    print("✅ Model loaded")
     
     # Cari gambar test
-    test_images = glob.glob('test/images/*.jpg')
+    test_images = glob.glob('../test/images/*.jpg')
     if not test_images:
-        print("❌ Tidak ada gambar test ditemukan di test/images/")
+        print("❌ Tidak ada gambar test ditemukan di ../test/images/")
         return
     
-    print(f"📸 Ditemukan {len(test_images)} gambar test")
+    print(f"📊 Ditemukan {len(test_images)} gambar test")
     
-    # Buat folder output
-    output_dir = 'demo_output_images'
+    # Buat output directory
+    output_dir = '../demo_output_images'
     os.makedirs(output_dir, exist_ok=True)
     
-    for i, img_path in enumerate(test_images[:5]):  # Hanya 5 gambar pertama
-        print(f"🔄 Processing: {os.path.basename(img_path)}")
+    # Process setiap gambar
+    for i, img_path in enumerate(test_images[:10]):  # Maksimal 10 gambar
+        print(f"Processing {i+1}/{min(10, len(test_images))}: {os.path.basename(img_path)}")
         
-        # Load dan resize gambar
+        # Load dan process gambar
         img = cv2.imread(img_path)
-        if img is None:
-            continue
-            
-        # Inference
-        start_time = time.time()
         results = model(img, conf=0.5, verbose=False)
-        inference_time = (time.time() - start_time) * 1000
         
         # Gambar hasil
         annotated_img = results[0].plot()
         
-        # Tambahkan info timing
-        cv2.putText(annotated_img, f"Inference: {inference_time:.1f}ms", (10, 30), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # Simpan hasil
+        output_filename = f"result_{i+1:02d}_{os.path.basename(img_path)}"
+        output_path = os.path.join(output_dir, output_filename)
+        cv2.imwrite(output_path, annotated_img)
         
-        # Save ke file
-        output_filename = f"{output_dir}/result_{i+1:02d}_{os.path.basename(img_path)}"
-        cv2.imwrite(output_filename, annotated_img)
-        print(f"   ✅ Saved: {output_filename}")
+        print(f"   ✅ Saved: {output_path}")
     
-    print(f"✅ Demo selesai! Hasil disimpan di folder: {output_dir}")
+    print(f"🎉 Demo selesai! Hasil disimpan di: {output_dir}")
 
 def demo_with_video(input_video, output_video=None, runtime='pytorch'):
-    """Demo menggunakan video input dan menghasilkan video output"""
+    """Demo dengan video file"""
     print(f"🎬 Demo dengan video: {input_video}")
+    print(f"🔧 Runtime: {runtime}")
     
     # Load model berdasarkan runtime
     if runtime == 'tensorrt':
-        model_path = 'models/YOLO12n/weights/best.engine'
-        print("🚀 Using TensorRT runtime")
+        model_path = '../models/YOLO12n/weights/best.engine'
+        if not os.path.exists(model_path):
+            print(f"❌ TensorRT engine tidak ditemukan: {model_path}")
+            print("💡 Gunakan runtime 'pytorch' atau buat TensorRT engine terlebih dahulu")
+            return
     else:
-        model_path = 'models/YOLO12n/weights/best.pt'
-        print("🐍 Using PyTorch runtime")
+        model_path = '../models/YOLO12n/weights/best.pt'
     
     model = YOLO(model_path)
     print(f"✅ Model loaded: {model_path}")
@@ -156,19 +152,33 @@ def demo_with_video(input_video, output_video=None, runtime='pytorch'):
         print("✅ Video processing completed!")
 
 def demo_tensorrt_vs_pytorch():
-    """Demo perbandingan TensorRT vs PyTorch - export ke file"""
-    print("⚡ Demo perbandingan TensorRT vs PyTorch...")
+    """Demo perbandingan PyTorch vs TensorRT"""
+    print("⚡🔥 Demo perbandingan PyTorch vs TensorRT")
+    
+    # Check apakah TensorRT engine ada
+    pytorch_path = '../models/YOLO12n/weights/best.pt'
+    tensorrt_path = '../models/YOLO12n/weights/best.engine'
+    
+    if not os.path.exists(pytorch_path):
+        print(f"❌ PyTorch model tidak ditemukan: {pytorch_path}")
+        return
+    
+    if not os.path.exists(tensorrt_path):
+        print(f"❌ TensorRT engine tidak ditemukan: {tensorrt_path}")
+        print("💡 Buat TensorRT engine terlebih dahulu dengan:")
+        print(f"   yolo export model={pytorch_path} format=engine")
+        return
     
     # Load kedua model
-    model_pytorch = YOLO('models/YOLO12n/weights/best.pt')
-    model_tensorrt = YOLO('models/YOLO12n/weights/best.engine')
+    model_pytorch = YOLO(pytorch_path)
+    model_tensorrt = YOLO(tensorrt_path)
     
-    print("✅ Models loaded:")
-    print("   - PyTorch: models/YOLO12n/weights/best.pt")
-    print("   - TensorRT: models/YOLO12n/weights/best.engine")
+    print("✅ Kedua model berhasil dimuat:")
+    print(f"   - PyTorch: {pytorch_path}")
+    print(f"   - TensorRT: {tensorrt_path}")
     
     # Ambil satu gambar test
-    test_images = glob.glob('test/images/*.jpg')
+    test_images = glob.glob('../test/images/*.jpg')
     if not test_images:
         print("❌ Tidak ada gambar test")
         return
@@ -230,8 +240,8 @@ def demo_video_comparison(input_video):
     print(f"🎬⚡ Demo perbandingan video: {input_video}")
     
     # Load kedua model
-    model_pytorch = YOLO('models/YOLO12n/weights/best.pt')
-    model_tensorrt = YOLO('models/YOLO12n/weights/best.engine')
+    model_pytorch = YOLO('../models/YOLO12n/weights/best.pt')
+    model_tensorrt = YOLO('../models/YOLO12n/weights/best.engine')
     
     print("✅ Models loaded untuk perbandingan")
     
