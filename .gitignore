@@ -1,7 +1,6 @@
 # YOLO Model Files
 *.pt
 *.onnx
-*.engine
 *.torchscript
 
 # Pre-trained Base Models
