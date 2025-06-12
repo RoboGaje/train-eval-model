@@ -65,7 +65,7 @@ Repository ini berisi implementasi lengkap untuk fine-tuning model YOLO dan real
 
 ### 1. Clone Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/RoboGaje/train-eval-model.git
 cd robotika-uas
 ```
 
