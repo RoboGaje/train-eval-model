@@ -56,6 +56,11 @@ robotika-uas/
 │   ├── demo_tracking.py             # Demo tracking
 │   ├── realtime_tracking.py         # Real-time webcam
 │   └── README.md                    # Dokumentasi inference
+├── 📁 training/                     # 🏋️ Script training
+│   ├── train_yolo_models.py         # Training semua model YOLO
+│   ├── train_facenet.py             # Training FaceNet dengan timestamp
+│   ├── preprocess_for_facenet.py    # Preprocessing dataset FaceNet
+│   └── README.md                    # Dokumentasi training
 ├── 📁 models/                       # Model yang sudah dilatih
 │   ├── YOLO12n/weights/
 │   ├── YOLO12s/weights/
@@ -65,9 +70,6 @@ robotika-uas/
 ├── 📁 evaluation/                   # Script evaluasi
 ├── 📁 facenet_dataset/              # Dataset FaceNet
 ├── 📁 test/images/                  # Test images
-├── train_yolo_models.py             # Training YOLO
-├── train_facenet.py                 # Training FaceNet
-├── preprocess_for_facenet.py        # Preprocessing FaceNet
 └── check_dataset.py                 # Dataset checker
 ```
 
@@ -79,7 +81,7 @@ robotika-uas/
 - **`demo_tracking.py`** - Demo tracking dengan output file
 - **`realtime_tracking.py`** - Real-time tracking dengan webcam
 
-### 🏋️ Training Scripts
+### 🏋️ Training Scripts (Direktori `training/`)
 - **`train_yolo_models.py`** - Fine-tuning semua model YOLO
 - **`train_facenet.py`** - Fine-tuning FaceNet dengan timestamp folders
 - **`preprocess_for_facenet.py`** - Preprocessing dataset untuk FaceNet
@@ -139,22 +141,29 @@ python realtime_tracking.py --runtime tensorrt --show-fps
 
 ### 1. Training Model (Opsional - Model sudah tersedia)
 
+**Masuk ke direktori training:**
+```bash
+cd training
+```
+
 #### YOLO Training
 ```bash
 # Training semua model
 python train_yolo_models.py
 
-# Training model spesifik
-python train_yolo_models.py --models yolov12n yolov12s
+# Model akan dilatih dengan batch size yang sudah dioptimalkan
 ```
 
 #### FaceNet Training
 ```bash
-# Training FaceNet (akan membuat folder dengan timestamp)
-python train_facenet.py --dataset facenet_dataset --epochs 50
+# Preprocessing dataset (jika belum)
+python preprocess_for_facenet.py
 
-# Lihat history training
-python train_facenet.py --list-trainings
+# Training FaceNet (akan membuat folder dengan timestamp)
+python train_facenet.py --epochs 50
+
+# Cek hasil training
+ls ../models/facenet_models/latest/
 ```
 
 ### 2. Demo Tracking (Tanpa Display)
@@ -298,20 +307,23 @@ Untuk performa maksimal, gunakan TensorRT engine:
 
 ### 1. Images Mode
 ```bash
+cd inference
 python demo_tracking.py --mode images
 ```
-- Memproses 5 gambar test pertama
-- Output: `demo_output_images/result_XX_filename.jpg`
+- Memproses 10 gambar test pertama
+- Output: `../demo_output_images/result_XX_filename.jpg`
 
 ### 2. Video Mode  
 ```bash
-python demo_tracking.py --mode video --input video.mp4 --runtime tensorrt
+cd inference
+python demo_tracking.py --mode video --input ../video.mp4 --runtime tensorrt
 ```
 - Memproses video dengan runtime pilihan
-- Output: `demo_output_tensorrt.mp4`
+- Output: `../demo_output_tensorrt.mp4`
 
 ### 3. Compare Mode
 ```bash
+cd inference
 python demo_tracking.py --mode compare
 ```
 - Membandingkan PyTorch vs TensorRT pada 1 gambar
@@ -319,7 +331,8 @@ python demo_tracking.py --mode compare
 
 ### 4. Video-Compare Mode
 ```bash
-python demo_tracking.py --mode video-compare --input video.mp4
+cd inference
+python demo_tracking.py --mode video-compare --input ../video.mp4
 ```
 - Membandingkan PyTorch vs TensorRT pada video
 - Output: 3 video (pytorch, tensorrt, comparison)
@@ -332,12 +345,14 @@ python demo_tracking.py --mode video-compare --input video.mp4
 python -c "import torch; print(torch.cuda.is_available())"
 
 # Jika TensorRT error, gunakan PyTorch
+cd inference
 python realtime_tracking.py --runtime pytorch
 ```
 
 ### 2. Camera Issues
 ```bash
 # Test camera lain
+cd inference
 python realtime_tracking.py --camera 1
 
 # Cek available cameras
@@ -347,19 +362,25 @@ ls /dev/video*
 ### 3. Memory Issues
 ```bash
 # Gunakan model lebih kecil
+cd inference
 python realtime_tracking.py --model yolov12n
 
 # Kurangi image size
 python realtime_tracking.py --imgsz 416
+
+# Untuk training, kurangi batch size
+cd training
+python train_facenet.py --batch-size 32
 ```
 
 ### 4. Display Issues (Server/Headless)
 ```bash
 # Gunakan demo mode (export ke file)
+cd inference
 python demo_tracking.py --mode images
 
 # Atau video mode
-python demo_tracking.py --mode video --input video.mp4
+python demo_tracking.py --mode video --input ../video.mp4
 ```
 
 ## 📁 Struktur File Output
@@ -375,6 +396,8 @@ robotika-uas/
 ├── result_tensorrt.jpg          # Hasil TensorRT
 ├── output_*.mp4                 # Video output
 ├── frame_*.jpg                  # Saved frames
+├── model_comparison_results.csv # YOLO training comparison
+├── model_comparison_charts.png  # YOLO training charts
 └── evaluation/
     ├── model_evaluation_results.csv
     └── model_comparison_visualizations.png
@@ -385,17 +408,26 @@ robotika-uas/
 1. **Demo cepat dengan gambar:**
 ```bash
 conda activate robotika-uas
+cd inference
 python demo_tracking.py --mode compare
 ```
 
 2. **Real-time tracking tercepat:**
 ```bash
+cd inference
 python realtime_tracking.py --runtime tensorrt --show-fps
 ```
 
 3. **Proses video dengan TensorRT:**
 ```bash
-python demo_tracking.py --mode video --input your_video.mp4 --runtime tensorrt
+cd inference
+python demo_tracking.py --mode video --input ../your_video.mp4 --runtime tensorrt
+```
+
+4. **Training FaceNet baru:**
+```bash
+cd training
+python train_facenet.py --epochs 50
 ```
 
 ## 📞 Support
@@ -403,9 +435,11 @@ python demo_tracking.py --mode video --input your_video.mp4 --runtime tensorrt
 Jika mengalami masalah:
 1. Pastikan environment `robotika-uas` aktif
 2. Cek ketersediaan model di folder `models/`
-3. Untuk server tanpa display, gunakan `demo_tracking.py`
-4. Untuk real-time, gunakan `realtime_tracking.py`
+3. Untuk inference, masuk ke direktori `inference/`
+4. Untuk training, masuk ke direktori `training/`
+5. Untuk server tanpa display, gunakan `demo_tracking.py`
+6. Untuk real-time, gunakan `realtime_tracking.py`
 
 ---
 
-**🎉 Happy Tracking!** 🎯 
+**🎉 Happy Tracking!** 🎯

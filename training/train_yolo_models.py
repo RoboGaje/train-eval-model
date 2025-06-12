@@ -17,7 +17,7 @@ import seaborn as sns
 
 # Konfigurasi training
 EPOCHS = 50
-DATA_CONFIG = 'data.yaml'
+DATA_CONFIG = '../data.yaml'
 
 # Model yang akan dilatih dan dibandingkan dengan batch size yang disesuaikan
 MODELS = {
@@ -80,7 +80,7 @@ def train_model(model_name, model_path, batch_size, epochs=EPOCHS):
         print(f"   Waktu training: {training_time/60:.2f} menit")
         
         # Simpan model yang sudah dilatih
-        best_model_path = f"runs/detect/{model_name}_epoch{epochs}_batch{batch_size}/weights/best.pt"
+        best_model_path = f"../runs/detect/{model_name}_epoch{epochs}_batch{batch_size}/weights/best.pt"
         
         return {
             'model_name': model_name,
@@ -156,8 +156,8 @@ def create_comparison_report(results):
     print(f"💾 Model terkecil: {smallest['model_name']} ({smallest['model_size_mb']:.2f} MB)")
     
     # Simpan hasil ke CSV
-    df.to_csv('model_comparison_results.csv', index=False)
-    print(f"\n💾 Hasil disimpan ke: model_comparison_results.csv")
+    df.to_csv('../model_comparison_results.csv', index=False)
+    print(f"\n💾 Hasil disimpan ke: ../model_comparison_results.csv")
     
     # Buat visualisasi
     create_visualizations(df)
@@ -207,8 +207,8 @@ def create_visualizations(df):
     axes[1,1].grid(True, alpha=0.3)
     
     plt.tight_layout()
-    plt.savefig('model_comparison_charts.png', dpi=300, bbox_inches='tight')
-    print("📊 Grafik perbandingan disimpan ke: model_comparison_charts.png")
+    plt.savefig('../model_comparison_charts.png', dpi=300, bbox_inches='tight')
+    print("📊 Grafik perbandingan disimpan ke: ../model_comparison_charts.png")
     
     return fig
 
@@ -284,9 +284,9 @@ def main():
     total_time = time.time() - total_start_time
     print(f"\n🎉 Proses fine-tuning dan evaluasi selesai!")
     print(f"⏱️  Total waktu: {total_time/60:.2f} menit")
-    print(f"📁 Hasil training tersimpan di folder: runs/detect/")
-    print(f"📊 Laporan perbandingan: model_comparison_results.csv")
-    print(f"📈 Grafik perbandingan: model_comparison_charts.png")
+    print(f"📁 Hasil training tersimpan di folder: ../runs/detect/")
+    print(f"📊 Laporan perbandingan: ../model_comparison_results.csv")
+    print(f"📈 Grafik perbandingan: ../model_comparison_charts.png")
 
 if __name__ == "__main__":
     main() 

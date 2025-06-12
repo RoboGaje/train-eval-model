@@ -328,7 +328,7 @@ class FaceNetTrainer:
         
         return val_loss, val_acc, all_preds, all_targets
     
-    def train(self, epochs=None, test_images_dir='test/images', num_test_images=10):
+    def train(self, epochs=None, test_images_dir='../test/images', num_test_images=10):
         """Training loop utama"""
         if epochs is None:
             epochs = EPOCHS
@@ -469,7 +469,7 @@ class FaceNetTrainer:
         
         print(f"📄 Classification report saved to: {report_path}")
 
-    def test_model_on_images(self, test_images_dir='test/images', num_test_images=10):
+    def test_model_on_images(self, test_images_dir='../test/images', num_test_images=10):
         """
         Test model pada gambar test dan simpan hasil visualisasi
         
@@ -810,7 +810,7 @@ class FaceNetTrainer:
         print(f"📊 Confusion matrix saved: {self.model_save_dir / 'confusion_matrix_test.png'}")
         print(f"📈 Class accuracy chart saved: {self.model_save_dir / 'class_accuracy_test.png'}")
     
-    def run_complete_evaluation(self, test_images_dir='test/images', num_test_images=10):
+    def run_complete_evaluation(self, test_images_dir='../test/images', num_test_images=10):
         """Run complete evaluation: test set + sample images"""
         print(f"\n🎯 Running Complete Model Evaluation...")
         
@@ -896,14 +896,14 @@ def main():
     global EPOCHS, BATCH_SIZE, LEARNING_RATE, FORCE_GPU, GPU_ID
     
     parser = argparse.ArgumentParser(description='Fine-tune FaceNet untuk face recognition')
-    parser.add_argument('--dataset', default='facenet_dataset', help='Path ke dataset yang sudah dipreprocess')
-    parser.add_argument('--output', default='models/facenet_models', help='Output directory untuk model')
+    parser.add_argument('--dataset', default='../facenet_dataset', help='Path ke dataset yang sudah dipreprocess')
+    parser.add_argument('--output', default='../models/facenet_models', help='Output directory untuk model')
     parser.add_argument('--epochs', type=int, default=None, help=f'Number of training epochs (default: {EPOCHS})')
     parser.add_argument('--batch-size', type=int, default=None, help=f'Batch size (default: {BATCH_SIZE})')
     parser.add_argument('--lr', type=float, default=None, help=f'Learning rate (default: {LEARNING_RATE})')
     parser.add_argument('--force-cpu', action='store_true', help='Force menggunakan CPU meskipun GPU tersedia')
     parser.add_argument('--gpu-id', type=int, default=None, help=f'GPU ID untuk digunakan (default: {GPU_ID})')
-    parser.add_argument('--test-images-dir', default='test/images', help='Directory gambar test untuk evaluasi visual')
+    parser.add_argument('--test-images-dir', default='../test/images', help='Directory gambar test untuk evaluasi visual')
     parser.add_argument('--num-test-images', type=int, default=10, help='Jumlah gambar test untuk evaluasi visual')
     
     args = parser.parse_args()

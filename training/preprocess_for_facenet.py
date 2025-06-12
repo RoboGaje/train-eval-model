@@ -252,8 +252,8 @@ class YOLOToFaceNetPreprocessor:
 
 def main():
     parser = argparse.ArgumentParser(description='Preprocess YOLO dataset untuk FaceNet')
-    parser.add_argument('--data', default='data.yaml', help='Path ke data.yaml')
-    parser.add_argument('--output', default='facenet_dataset', help='Output directory')
+    parser.add_argument('--data', default='../data.yaml', help='Path ke data.yaml')
+    parser.add_argument('--output', default='../facenet_dataset', help='Output directory')
     parser.add_argument('--padding', type=float, default=0.2, help='Padding untuk crop (default: 0.2)')
     
     args = parser.parse_args()
