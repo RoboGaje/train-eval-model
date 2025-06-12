@@ -131,3 +131,12 @@ tmp/
 # Backup files
 *.bak
 *.backup 
+
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.wmv
+
+facenet_dataset/
