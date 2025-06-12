@@ -1,6 +1,6 @@
 # 🚀 Inference Scripts
 
-Direktori ini berisi script-script untuk melakukan inference menggunakan model YOLO dan FaceNet yang sudah dilatih.
+Direktori ini berisi script-script untuk melakukan inference menggunakan model YOLO dan FaceNet.
 
 ## 📁 Struktur Direktori
 
@@ -10,18 +10,26 @@ inference/
 ├── facenet_yolo_inference.py      # YOLO + FaceNet inference (utama)
 ├── facenet_inference.py           # FaceNet inference murni
 ├── demo_tracking.py               # Demo tracking dengan output file
-├── realtime_tracking.py           # Real-time tracking dengan webcam
+├── realtime_tracking.py          # Real-time tracking dengan webcam
 └── body_detection_inference.py    # Body detection dengan YOLO pre-trained
 ```
 
-## 🎯 YOLO + FaceNet Face Recognition System
+## 🎯 Script Utama
 
-### **Overview**
+### 1. **facenet_yolo_inference.py** - YOLO + FaceNet Inference
+
+Script utama yang menggabungkan YOLO untuk face detection dan FaceNet untuk face recognition.
+
+#### **Overview**
 Sistem face recognition hybrid yang menggabungkan:
 - **YOLO**: Face detection (mendeteksi lokasi wajah)
 - **FaceNet**: Face recognition (mengidentifikasi identitas wajah)
 
-### **Fitur Utama**
+#### **Fitur Utama**
+- ✅ Dual prediction: YOLO classification + FaceNet recognition
+- ⚡ TensorRT support untuk performa maksimal
+- 🎬 Support image dan video processing
+- 🔧 Configurable frame intervals untuk video
 
 #### 🔍 **Dual Prediction System**
 - Menampilkan prediksi YOLO dan FaceNet secara bersamaan
@@ -44,32 +52,25 @@ Sistem face recognition hybrid yang menggabungkan:
 - Konsistensi dengan FaceNet class names
 - Support custom class mapping
 
-### **Performance Comparison**
+#### **Technical Details**
 
-#### **Regular YOLO vs TensorRT**
-| Mode | Time | FPS | Improvement |
-|------|------|-----|-------------|
-| Regular PT | 26.9s | 25.7 FPS | Baseline |
-| TensorRT | 23.6s | 29.4 FPS | **+14% faster** |
+##### **Architecture**
+```
+Input Image/Video
+    ↓
+YOLO Detection (Bounding Boxes)
+    ↓
+Face Cropping
+    ↓
+FaceNet Recognition (Identity)
+    ↓
+Dual Label Display
+```
 
-#### **Frame Interval Impact**
-| Interval | Time | FPS | Quality |
-|----------|------|-----|---------|
-| 1 (every frame) | 45.5s | 15.2 FPS | ⭐⭐⭐⭐⭐ |
-| 3 (default) | 26.9s | 25.7 FPS | ⭐⭐⭐⭐ |
-| 5 (fast) | 22.7s | 30.5 FPS | ⭐⭐⭐ |
-
-## 🎯 Script Utama
-
-### 1. **facenet_yolo_inference.py** - YOLO + FaceNet Inference
-
-Script utama yang menggabungkan YOLO untuk face detection dan FaceNet untuk face recognition.
-
-**Fitur:**
-- ✅ Dual prediction: YOLO classification + FaceNet recognition
-- ⚡ TensorRT support untuk performa maksimal
-- 🎬 Support image dan video processing
-- 🔧 Configurable frame intervals untuk video
+##### **Class Mapping**
+- YOLO classes: `['dimas', 'fabian', 'people face', 'sendy', 'syahrul']`
+- Mapped to: `['dimas', 'fabian', 'unknown', 'sendy', 'syahrul']`
+- FaceNet classes: `['dimas', 'fabian', 'sendy', 'syahrul', 'unknown']`
 
 **Usage:**
 
@@ -90,24 +91,12 @@ python facenet_yolo_inference.py \
   --facenet-model ../models/facenet_models/latest/best_facenet.pth \
   --mapping ../models/facenet_models/latest/class_mapping.pkl \
   --mode video \
-  --input ../WIN_20250612_17_21_33_Pro.mp4 \
+  --input ../video.mp4 \
   --output ../result.mp4 \
   --use-tensorrt \
   --frame-interval 3 \
   --yolo-conf 0.5 \
   --facenet-conf 0.7
-
-# High Quality Processing
-python facenet_yolo_inference.py \
-  --yolo-model ../models/YOLO12n/weights/best.pt \
-  --facenet-model ../models/facenet_models/latest/best_facenet.pth \
-  --mapping ../models/facenet_models/latest/class_mapping.pkl \
-  --mode video \
-  --input ../video.mp4 \
-  --output ../result_hq.mp4 \
-  --frame-interval 1 \
-  --yolo-conf 0.3 \
-  --facenet-conf 0.8
 ```
 
 **Parameters:**
@@ -126,21 +115,6 @@ python facenet_yolo_inference.py \
 | `--use-tensorrt` | False | Enable TensorRT acceleration |
 | `--device` | Auto | Device: cuda atau cpu |
 | `--show` | False | Display results |
-
-**Output Format:**
-
-#### **Bounding Box Labels**
-- **Top (Yellow)**: `YOLO: [class] ([confidence])`
-- **Bottom (Green/Red)**: `FaceNet: [identity] ([confidence])`
-- **Color**: Green untuk known faces, Red untuk unknown
-
-#### **Console Output**
-```
-✅ Detected 1 faces
-   Face 1:
-     YOLO: sendy (conf: 0.919)
-     FaceNet: syahrul (conf: 0.976)
-```
 
 ### 2. **body_detection_inference.py** - Body Detection dengan YOLO Pre-trained
 
@@ -219,7 +193,7 @@ python facenet_inference.py \
   --model ../models/facenet_models/latest/best_facenet.pth \
   --mapping ../models/facenet_models/latest/class_mapping.pkl \
   --mode video \
-  --input ../WIN_20250612_17_21_33_Pro.mp4 \
+  --input ../video.mp4 \
   --output ../facenet_result.mp4
 
 # Real-time webcam
@@ -249,7 +223,7 @@ python demo_tracking.py --mode images
 # Demo video dengan TensorRT
 python demo_tracking.py \
   --mode video \
-  --input ../WIN_20250612_17_21_33_Pro.mp4 \
+  --input ../video.mp4 \
   --output ../demo_result.mp4 \
   --runtime tensorrt
 ```
@@ -285,37 +259,6 @@ python realtime_tracking.py \
 - `SPACE`: Pause/Resume
 - `Q/ESC`: Quit
 - `S`: Save current frame
-
-## 🔧 Technical Details
-
-### **Architecture**
-```
-Input Image/Video
-    ↓
-YOLO Detection (Bounding Boxes)
-    ↓
-Face Cropping
-    ↓
-FaceNet Recognition (Identity)
-    ↓
-Dual Label Display
-```
-
-### **Class Mapping**
-- YOLO classes: `['dimas', 'fabian', 'people face', 'sendy', 'syahrul']`
-- Mapped to: `['dimas', 'fabian', 'unknown', 'sendy', 'syahrul']`
-- FaceNet classes: `['dimas', 'fabian', 'sendy', 'syahrul', 'unknown']`
-
-### **COCO Classes (Body Detection)**
-- Total: 80 classes
-- Person class: Index 0
-- Full list: person, bicycle, car, motorcycle, airplane, bus, train, truck, boat, ...
-
-### **Model Requirements**
-- **YOLO**: YOLOv12n trained model (.pt) atau TensorRT engine (.engine)
-- **FaceNet**: Custom trained model dengan InceptionResnetV1 backbone
-- **YOLO Pre-trained**: COCO pre-trained models untuk body detection
-- **GPU**: CUDA-capable GPU recommended untuk performa optimal
 
 ## 🔧 Model Paths
 
@@ -358,43 +301,6 @@ Untuk performa maksimal, gunakan TensorRT engine:
 --yolo-model ../models/YOLO12n/weights/best.engine
 ```
 
-## 📊 Performance Tips
-
-1. **Frame Interval**: Gunakan `--frame-interval 3` untuk video processing yang lebih cepat
-2. **TensorRT**: Selalu gunakan TensorRT untuk performa terbaik
-3. **Confidence Threshold**: Sesuaikan threshold untuk balance antara accuracy dan speed
-4. **Image Size**: Gunakan `--imgsz 640` untuk balance antara accuracy dan speed
-5. **Body Detection**: Gunakan filtering approach untuk stability dan performa optimal
-
-## 🎯 Class Names
-
-### **Face Recognition Model**
-Model mendukung 5 classes:
-- `dimas` - Warna: Biru
-- `fabian` - Warna: Hijau  
-- `people face` / `unknown` - Warna: Merah
-- `sendy` - Warna: Cyan
-- `syahrul` - Warna: Magenta
-
-### **Body Detection Model (COCO)**
-Model mendukung 80 classes, fokus pada:
-- `person` (index 0) - Warna: Hijau
-- Filtering untuk hanya deteksi bodies
-
-## 🎯 Use Cases
-
-### **Face Recognition System**
-1. **Security Systems**: Real-time face recognition dengan dual verification
-2. **Attendance Systems**: Akurat identification dengan confidence scoring
-3. **Video Analytics**: Batch processing video dengan optimized performance
-4. **Research**: Comparison antara detection dan recognition models
-
-### **Body Detection System**
-1. **People Counting**: Hitung jumlah orang di area tertentu
-2. **Crowd Analysis**: Analisis kepadatan dan pergerakan crowd
-3. **Security Monitoring**: Deteksi kehadiran orang di area restricted
-4. **Retail Analytics**: Customer flow analysis di toko
-
 ## 🚨 Troubleshooting
 
 ### **TensorRT Issues**
@@ -409,10 +315,6 @@ Model mendukung 80 classes, fokus pada:
 ### **Memory Issues**
 - Reduce `--frame-interval` untuk mengurangi memory usage
 - Use CPU mode dengan `--device cpu` jika GPU memory terbatas
-
-### **Body Detection Issues**
-- **Model tidak ditemukan**: Jalankan `download_yolo_pretrained.py` dulu
-- **Akurasi rendah**: Turunkan confidence threshold atau gunakan model yang lebih besar
 
 ### Model tidak ditemukan
 ```bash
@@ -446,47 +348,3 @@ yolo export model=../models/YOLO12n/weights/best.pt format=engine
 - Coba camera index lain: `--camera 1`
 - Pastikan webcam tidak digunakan aplikasi lain
 - Check permission webcam
-
-## 📝 Examples
-
-### Quick Start - Face Recognition
-```bash
-cd inference
-python facenet_yolo_inference.py \
-  --yolo-model ../models/YOLO12n/weights/best.pt \
-  --facenet-model ../models/facenet_models/latest/best_facenet.pth \
-  --mapping ../models/facenet_models/latest/class_mapping.pkl \
-  --mode video \
-  --input ../WIN_20250612_17_21_33_Pro.mp4 \
-  --output ../result.mp4 \
-  --use-tensorrt
-```
-
-### Quick Start - Body Detection
-```bash
-cd inference
-
-# Download model dulu (otomatis via ultralytics)
-pip install ultralytics
-python -c "from ultralytics import YOLO; YOLO('yolo12n.pt')"
-
-# Body detection dengan TensorRT
-python body_detection_inference.py \
-  --model yolo12n.engine \
-  --mode video \
-  --input ../video.mp4 \
-  --output ../body_result.mp4 \
-  --use-tensorrt
-```
-
-### Quick Start - Real-time Webcam
-```bash
-cd inference
-python realtime_tracking.py --runtime tensorrt --show-fps
-```
-
-### Quick Start - Demo
-```bash
-cd inference
-python demo_tracking.py --mode images
-```
