@@ -151,6 +151,7 @@ Script untuk body detection menggunakan YOLO12n pre-trained model dengan COCO da
 - ⚡ **COCO Pre-trained**: Menggunakan model yang sudah dilatih dengan 80 classes
 - 🎬 **Video Support**: Support untuk image dan video processing
 - 📊 **Performance Info**: Menampilkan inference time dan FPS
+- ⚡ **TensorRT Support**: Support TensorRT engine untuk optimasi performa (lebih cepat)
 
 **Approach:**
 
@@ -160,6 +161,7 @@ Script untuk body detection menggunakan YOLO12n pre-trained model dengan COCO da
 - Filter hasil untuk hanya ambil class 'person' (index 0)
 - **Pros**: Mudah, stabil, tidak perlu modifikasi model
 - **Performance**: ~18ms inference time, 38+ FPS untuk video
+- **TensorRT**: ~5ms inference time, 120+ FPS dengan TensorRT engine
 
 **Usage:**
 
@@ -176,25 +178,28 @@ python body_detection_inference.py \
   --output ../body_result.jpg \
   --show
 
-# Video Processing
+# Video Processing dengan TensorRT
 python body_detection_inference.py \
-  --model yolo12n.pt \
+  --model yolo12n.engine \
   --mode video \
-  --input ../WIN_20250612_17_21_33_Pro.mp4 \
-  --output ../body_result.mp4
+  --input ../video.mp4 \
+  --output ../body_result.mp4 \
+  --use-tensorrt \
+  --confidence 0.5
 ```
 
 **Parameters:**
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `--model` | yolo12n.pt | Path ke YOLO pre-trained model |
+| `--model` | yolo12n.pt | Path ke YOLO pre-trained model (.pt atau .engine) |
 | `--mode` | image | Mode: image atau video |
 | `--input` | Required | Input file path |
 | `--output` | Optional | Output file path |
 | `--confidence` | 0.5 | Confidence threshold untuk person detection |
 | `--show` | False | Display results |
 | `--device` | Auto | Device: cuda atau cpu |
+| `--use-tensorrt` | False | Enable TensorRT acceleration |
 
 ### 3. **facenet_inference.py** - FaceNet Pure Recognition
 
@@ -247,14 +252,6 @@ python demo_tracking.py \
   --input ../WIN_20250612_17_21_33_Pro.mp4 \
   --output ../demo_result.mp4 \
   --runtime tensorrt
-
-# Perbandingan PyTorch vs TensorRT
-python demo_tracking.py --mode compare
-
-# Perbandingan video
-python demo_tracking.py \
-  --mode video-compare \
-  --input ../WIN_20250612_17_21_33_Pro.mp4
 ```
 
 ### 5. **realtime_tracking.py** - Real-time Webcam Tracking
@@ -473,12 +470,13 @@ cd inference
 pip install ultralytics
 python -c "from ultralytics import YOLO; YOLO('yolo12n.pt')"
 
-# Body detection
+# Body detection dengan TensorRT
 python body_detection_inference.py \
-  --model yolo12n.pt \
+  --model yolo12n.engine \
   --mode video \
-  --input ../WIN_20250612_17_21_33_Pro.mp4 \
-  --output ../body_result.mp4
+  --input ../video.mp4 \
+  --output ../body_result.mp4 \
+  --use-tensorrt
 ```
 
 ### Quick Start - Real-time Webcam
@@ -491,34 +489,4 @@ python realtime_tracking.py --runtime tensorrt --show-fps
 ```bash
 cd inference
 python demo_tracking.py --mode images
-```
-
-## 🔄 Workflow Recommendations
-
-### **1. Setup Models**
-```bash
-# Download YOLO pre-trained untuk body detection (otomatis via ultralytics)
-pip install ultralytics
-python -c "from ultralytics import YOLO; YOLO('yolo12n.pt')"
-
-# Pastikan custom trained models ada
-ls ../models/YOLO12n/weights/best.pt
-ls ../models/facenet_models/latest/
-```
-
-### **2. Production Inference**
-```bash
-# Face recognition (custom trained)
-python facenet_yolo_inference.py \
-  --yolo-model ../models/YOLO12n/weights/best.pt \
-  --facenet-model ../models/facenet_models/latest/best_facenet.pth \
-  --mode video \
-  --input ../video.mp4 \
-  --use-tensorrt
-
-# Body detection (pre-trained)
-python body_detection_inference.py \
-  --model yolo12n.pt \
-  --mode video \
-  --input ../video.mp4
 ```
