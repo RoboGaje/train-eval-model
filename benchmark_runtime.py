@@ -15,7 +15,7 @@ from ultralytics import YOLO
 import warnings
 warnings.filterwarnings('ignore')
 
-# Model yang sudah ada berdasarkan tree output - HANYA YOLOv12n
+# Model yang sudah ada berdasarkan tree output
 AVAILABLE_MODELS = {
     'YOLOv12n': {
         'pytorch': 'models/YOLO12n/weights/best.pt',
@@ -23,6 +23,20 @@ AVAILABLE_MODELS = {
         'tensorrt': 'models/YOLO12n/weights/best.engine',
         'openvino': 'models/YOLO12n/weights/best_openvino_model',
         'ncnn': 'models/YOLO12n/weights/best_ncnn_model',
+    },
+    'YOLOv12s': {
+        'pytorch': 'models/YOLO12s/weights/best.pt',
+        'onnx': 'models/YOLO12s/weights/best.onnx',
+        'openvino': 'models/YOLO12s/weights/best_openvino_model',
+        'ncnn': 'models/YOLO12s/weights/best_ncnn_model',
+        'tflite': 'models/YOLO12s/weights/best_saved_model/best_float32.tflite',
+    },
+    'YOLOv12m': {
+        'pytorch': 'models/YOLOv12m/weights/best.pt',
+        'onnx': 'models/YOLOv12m/weights/best.onnx',
+        'openvino': 'models/YOLOv12m/weights/best_openvino_model',
+        'ncnn': 'models/YOLOv12m/weights/best_ncnn_model',
+        'tflite': 'models/YOLOv12m/weights/best_saved_model/best_float32.tflite',
     }
 }
 
@@ -89,7 +103,7 @@ def benchmark_model_engine(model_path, engine_name, test_image, model_name):
 
 def main():
     """Fungsi utama"""
-    print("🚀 YOLO YOLOv12n Benchmark - Semua Engine")
+    print("🚀 YOLO Simple Benchmark")
     print("="*50)
     
     # Siapkan test image
@@ -120,13 +134,13 @@ def main():
     
     # Tampilkan hasil
     print("\n" + "="*70)
-    print("📊 HASIL BENCHMARK YOLOv12n - SEMUA ENGINE")
+    print("📊 HASIL BENCHMARK")
     print("="*70)
     print(df.to_string(index=False))
     
     # Simpan hasil
-    df.to_csv('yolov12n_benchmark_results.csv', index=False)
-    print(f"\n💾 Hasil disimpan ke: yolov12n_benchmark_results.csv")
+    df.to_csv('benchmark_simple_results.csv', index=False)
+    print(f"\n💾 Hasil disimpan ke: benchmark_simple_results.csv")
     
     # Cari engine tercepat untuk setiap model
     print("\n🏆 ENGINE TERCEPAT:")
@@ -141,26 +155,27 @@ def main():
     
     # FPS comparison
     plt.subplot(1, 2, 1)
-    engines = df['engine'].tolist()
-    fps_values = df['fps'].tolist()
-    plt.bar(engines, fps_values, color=['skyblue', 'lightcoral', 'lightgreen', 'orange', 'purple'])
-    plt.title('YOLOv12n - FPS Comparison')
-    plt.ylabel('FPS (Frames Per Second)')
+    df_pivot = df.pivot(index='engine', columns='model', values='fps')
+    df_pivot.plot(kind='bar', ax=plt.gca())
+    plt.title('FPS Comparison')
+    plt.ylabel('FPS')
     plt.xticks(rotation=45)
+    plt.legend()
     
     # Time comparison
     plt.subplot(1, 2, 2)
-    time_values = df['avg_time_ms'].tolist()
-    plt.bar(engines, time_values, color=['lightgreen', 'orange', 'purple', 'pink', 'cyan'])
-    plt.title('YOLOv12n - Average Time Comparison')
+    df_pivot_time = df.pivot(index='engine', columns='model', values='avg_time_ms')
+    df_pivot_time.plot(kind='bar', ax=plt.gca())
+    plt.title('Average Time Comparison')
     plt.ylabel('Time (ms)')
     plt.xticks(rotation=45)
+    plt.legend()
     
     plt.tight_layout()
-    plt.savefig('yolov12n_benchmark_results.png', dpi=300, bbox_inches='tight')
-    print("📊 Visualisasi disimpan ke: yolov12n_benchmark_results.png")
+    plt.savefig('benchmark_simple_results.png', dpi=300, bbox_inches='tight')
+    print("📊 Visualisasi disimpan ke: benchmark_simple_results.png")
     
-    print(f"\n🎉 Benchmark YOLOv12n selesai! Total engine tested: {len(results)}")
+    print(f"\n🎉 Benchmark selesai! Total tests: {len(results)}")
 
 if __name__ == "__main__":
     main() 
