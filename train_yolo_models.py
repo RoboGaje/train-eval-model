@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 Script untuk fine-tuning dan membandingkan performa model YOLO
-Epoch: 50, Batch: 64
 Model yang akan dibandingkan: YOLOv12n, YOLOv12s, YOLOv12m, YOLOv12l, YOLOv12x
 """
 

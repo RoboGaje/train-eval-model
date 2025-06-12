@@ -1,0 +1,18 @@
+# Runtime Benchmarking Dependencies
+onnxruntime-gpu>=1.15.0
+tensorflow>=2.12.0
+openvino>=2023.0.0
+
+# Optional (may require special installation)
+# tensorrt>=8.0.0  # Requires NVIDIA TensorRT installation
+# pyncnn  # NCNN Python bindings
+
+# Core dependencies (should already be installed)
+ultralytics>=8.0.0
+torch>=1.9.0
+torchvision>=0.10.0
+numpy>=1.21.0
+pandas>=1.3.0
+matplotlib>=3.5.0
+seaborn>=0.11.0
+opencv-python>=4.5.0 
