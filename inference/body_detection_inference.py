@@ -14,7 +14,7 @@ from ultralytics import YOLO
 import os
 
 class BodyDetectionInference:
-    def __init__(self, model_path, device=None, confidence=0.5):
+    def __init__(self, model_path, device=None, confidence=0.5, use_tensorrt=False):
         """
         Initialize body detection inference
         
@@ -22,9 +22,11 @@ class BodyDetectionInference:
             model_path: Path ke YOLO model
             device: Device untuk inference
             confidence: Confidence threshold
+            use_tensorrt: Flag untuk menggunakan TensorRT engine
         """
         self.model_path = Path(model_path)
         self.confidence = confidence
+        self.use_tensorrt = use_tensorrt
         
         # Set device
         if device is None:
@@ -36,6 +38,15 @@ class BodyDetectionInference:
         print(f"📊 Confidence threshold: {confidence}")
         
         self.person_class_id = 0  # Index untuk 'person' di COCO
+        
+        # Jika flag TensorRT digunakan dan path masih .pt, cari .engine
+        if self.use_tensorrt and self.model_path.suffix != '.engine':
+            engine_path = self.model_path.with_suffix('.engine')
+            if engine_path.exists():
+                print(f"⚡ Menggunakan TensorRT engine: {engine_path.name}")
+                self.model_path = engine_path
+            else:
+                print("⚠️  TensorRT engine tidak ditemukan, fallback ke PyTorch model .pt")
         
         # Load model
         self.load_model()
@@ -235,10 +246,12 @@ def main():
     parser.add_argument('--confidence', type=float, default=0.5, help='Confidence threshold')
     parser.add_argument('--show', action='store_true', help='Tampilkan hasil')
     parser.add_argument('--device', help='Device untuk inference (cuda/cpu)')
+    parser.add_argument('--use-tensorrt', action='store_true', help='Gunakan TensorRT engine (.engine) jika tersedia')
 
     # Contoh penggunaan dari direktori inference:
     # python body_detection_inference.py --model yolo12n.pt --mode image --input ../test/images/sample.jpg --output ../body_result.jpg
     # python body_detection_inference.py --model yolo12n.pt --mode video --input ../video.mp4 --output ../body_result.mp4
+    # python body_detection_inference.py --model yolo12n.engine --mode image --input sample.jpg --use-tensorrt
     
     args = parser.parse_args()
     
@@ -246,7 +259,8 @@ def main():
     detector = BodyDetectionInference(
         model_path=args.model,
         device=args.device,
-        confidence=args.confidence
+        confidence=args.confidence,
+        use_tensorrt=args.use_tensorrt
     )
     
     # Run inference based on mode
