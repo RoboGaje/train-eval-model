@@ -2,83 +2,80 @@ FACENET TEST RESULTS SUMMARY
 ==================================================
 
 Total Images Tested: 10
-Total Faces Detected: 34
-Average Faces per Image: 3.40
+Total Faces Detected: 32
+Average Faces per Image: 3.20
 
-Image: frame_005190_jpg.rf.dbd84892cae5aef288f6978255c8cafa.jpg
-  Faces detected: 5
-    Face 1: unknown (confidence: 0.999)
-    Face 2: unknown (confidence: 0.999)
-    Face 3: dimas (confidence: 0.844)
-    Face 4: unknown (confidence: 0.994)
-    Face 5: unknown (confidence: 0.996)
-
-Image: frame_001710_jpg.rf.b010a27dc6fbb8a934c3ed13b56f60df.jpg
-  Faces detected: 1
-    Face 1: unknown (confidence: 0.999)
-
-Image: 2025-06-11-15-42-48_mp4-0032_jpg.rf.974786853c5f715f3f98637fde4a1e21.jpg
-  Faces detected: 1
-    Face 1: syahrul (confidence: 0.979)
-
-Image: frame_003300_jpg.rf.1b0b2dea9d2024d8eca9477a419296d8.jpg
+Image: frame_006150_jpg.rf.80c7b8cfa52b6350ee8b18797c35cad5.jpg
   Faces detected: 7
-    Face 1: unknown (confidence: 0.999)
-    Face 2: syahrul (confidence: 0.968)
-    Face 3: sendy (confidence: 0.978)
-    Face 4: unknown (confidence: 0.999)
-    Face 5: unknown (confidence: 0.998)
-    Face 6: unknown (confidence: 0.998)
-    Face 7: unknown (confidence: 0.999)
-
-Image: frame_007770_jpg.rf.4e80d33e5882fa5bfbd81f2b6a156ace.jpg
-  Faces detected: 6
-    Face 1: unknown (confidence: 0.999)
-    Face 2: unknown (confidence: 0.999)
+    Face 1: unknown (confidence: 0.998)
+    Face 2: unknown (confidence: 0.998)
     Face 3: unknown (confidence: 0.999)
     Face 4: syahrul (confidence: 0.979)
-    Face 5: sendy (confidence: 0.980)
-    Face 6: unknown (confidence: 0.992)
+    Face 5: unknown (confidence: 0.991)
+    Face 6: unknown (confidence: 0.997)
+    Face 7: unknown (confidence: 0.998)
 
-Image: frame_007620_jpg.rf.9497ced9b73866fba9cfdaf67ce347fa.jpg
-  Faces detected: 3
-    Face 1: sendy (confidence: 0.907)
-    Face 2: syahrul (confidence: 0.945)
-    Face 3: unknown (confidence: 0.997)
-
-Image: 2025-06-11-15-42-48_mp4-0103_jpg.rf.575de967f38af1d6312719f970f6d3df.jpg
-  Faces detected: 1
-    Face 1: syahrul (confidence: 0.980)
+Image: test_image_05_frame_004500_jpg.rf.f55f4a0c6d5e224550342ae4315ded49_face_08.jpg
+  Faces detected: 0
 
 Image: frame_005850_jpg.rf.6350119a47af95fa7dded5bf690bd907.jpg
   Faces detected: 5
     Face 1: unknown (confidence: 0.999)
     Face 2: unknown (confidence: 0.999)
-    Face 3: unknown (confidence: 0.996)
-    Face 4: unknown (confidence: 0.997)
+    Face 3: unknown (confidence: 0.998)
+    Face 4: unknown (confidence: 0.987)
     Face 5: unknown (confidence: 0.999)
 
-Image: 2025-06-11-15-42-48_mp4-0054_jpg.rf.497097c064619e2d637b91626b7a0986.jpg
+Image: test_image_09_frame_005340_jpg.rf.c7916a93c7319499dd27a62b84a39b86_face_01.jpg
   Faces detected: 1
-    Face 1: sendy (confidence: 0.818)
+    Face 1: unknown (confidence: 0.999)
 
-Image: frame_003270_jpg.rf.bdd485042d7f0d6705c7de2bfbcc46a5.jpg
-  Faces detected: 4
-    Face 1: dimas (confidence: 0.866)
-    Face 2: unknown (confidence: 0.999)
-    Face 3: unknown (confidence: 0.997)
+Image: frame_004650_jpg.rf.6cd1c7890a8de94977c43f3b0c11404f.jpg
+  Faces detected: 5
+    Face 1: syahrul (confidence: 0.972)
+    Face 2: sendy (confidence: 0.875)
+    Face 3: unknown (confidence: 0.999)
     Face 4: unknown (confidence: 0.998)
+    Face 5: unknown (confidence: 0.999)
+
+Image: frame_004920_jpg.rf.903b6d64594211325c6cedee334328cd.jpg
+  Faces detected: 3
+    Face 1: sendy (confidence: 0.988)
+    Face 2: syahrul (confidence: 0.983)
+    Face 3: unknown (confidence: 0.998)
+
+Image: frame_001290_jpg.rf.a9c85961f23f5a8d7d6db8496186d781.jpg
+  Faces detected: 5
+    Face 1: unknown (confidence: 0.964)
+    Face 2: unknown (confidence: 0.567)
+    Face 3: unknown (confidence: 0.989)
+    Face 4: unknown (confidence: 0.994)
+    Face 5: unknown (confidence: 0.997)
+
+Image: test_image_15_frame_006420_jpg.rf.f8c4aac27db44654844441c2186fe8b5_face_02.jpg
+  Faces detected: 0
+
+Image: frame_005190_jpg.rf.dbd84892cae5aef288f6978255c8cafa.jpg
+  Faces detected: 5
+    Face 1: unknown (confidence: 0.999)
+    Face 2: unknown (confidence: 0.999)
+    Face 3: unknown (confidence: 0.726)
+    Face 4: unknown (confidence: 0.997)
+    Face 5: unknown (confidence: 0.997)
+
+Image: frame_007260_jpg.rf.7fe6377b260cddf63b19f122dcec7c27.jpg
+  Faces detected: 1
+    Face 1: unknown (confidence: 0.985)
 
 CLASS DISTRIBUTION:
 --------------------
-dimas: 2 faces (5.9%)
-sendy: 4 faces (11.8%)
-syahrul: 5 faces (14.7%)
-unknown: 23 faces (67.6%)
+sendy: 2 faces (6.2%)
+syahrul: 3 faces (9.4%)
+unknown: 27 faces (84.4%)
 
 CONFIDENCE STATISTICS:
 --------------------
-Average Confidence: 0.976
-Min Confidence: 0.818
+Average Confidence: 0.968
+Min Confidence: 0.567
 Max Confidence: 0.999
-Std Confidence: 0.046
+Std Confidence: 0.088

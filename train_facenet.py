@@ -21,6 +21,7 @@ from facenet_pytorch import InceptionResnetV1, MTCNN
 import cv2
 from PIL import Image
 import seaborn as sns
+from datetime import datetime
 
 # ==================== GLOBAL CONFIGURATION ====================
 # Training Configuration
@@ -85,6 +86,23 @@ def check_gpu_availability():
     print(f"✅ Menggunakan: {device}")
     return device
 
+def create_timestamped_output_dir(base_output_dir):
+    """
+    Buat directory output dengan timestamp untuk menghindari overwrite
+    
+    Args:
+        base_output_dir: Base directory (e.g., 'models/facenet_models')
+    
+    Returns:
+        Path ke directory baru dengan timestamp
+    """
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamped_dir = Path(base_output_dir) / f"training_{timestamp}"
+    timestamped_dir.mkdir(parents=True, exist_ok=True)
+    
+    print(f"📁 Training output directory: {timestamped_dir}")
+    return timestamped_dir
+
 class FaceNetDataset(Dataset):
     """Custom dataset untuk FaceNet training"""
     
@@ -132,12 +150,13 @@ class FaceNetTrainer:
         
         Args:
             dataset_dir: Path ke dataset yang sudah dipreprocess
-            model_save_dir: Directory untuk menyimpan model
+            model_save_dir: Base directory untuk menyimpan model (akan ditambah timestamp)
             device: Device untuk training (akan di-override oleh check_gpu_availability)
         """
         self.dataset_dir = Path(dataset_dir)
-        self.model_save_dir = Path(model_save_dir)
-        self.model_save_dir.mkdir(exist_ok=True)
+        
+        # Buat directory dengan timestamp
+        self.model_save_dir = create_timestamped_output_dir(model_save_dir)
         
         # Set device dengan GPU checking
         self.device = check_gpu_availability()
@@ -148,6 +167,7 @@ class FaceNetTrainer:
         print(f"   📈 Learning Rate: {LEARNING_RATE}")
         print(f"   🎯 Image Size: {IMAGE_SIZE}x{IMAGE_SIZE}")
         print(f"   🧠 Architecture: {FEATURE_DIM} -> {HIDDEN_DIM} -> num_classes")
+        print(f"   💾 Output Directory: {self.model_save_dir}")
         
         # Data transforms
         self.train_transform = transforms.Compose([
@@ -818,7 +838,8 @@ class FaceNetTrainer:
             f.write(f"  Batch Size: {BATCH_SIZE}\n")
             f.write(f"  Learning Rate: {LEARNING_RATE}\n")
             f.write(f"  Architecture: {FEATURE_DIM} -> {HIDDEN_DIM} -> {len(self.class_names)}\n")
-            f.write(f"  Classes: {', '.join(self.class_names)}\n\n")
+            f.write(f"  Classes: {', '.join(self.class_names)}\n")
+            f.write(f"  Output Directory: {self.model_save_dir}\n\n")
             
             if test_metrics:
                 f.write("📊 TEST SET EVALUATION:\n")
@@ -839,13 +860,36 @@ class FaceNetTrainer:
                 f.write(f"  Avg Faces/Image: {total_faces/total_images:.2f}\n\n")
             
             f.write("📁 OUTPUT FILES:\n")
-            f.write(f"  Models: models/facenet_models/\n")
-            f.write(f"  Test Results: models/facenet_models/test_results/\n")
-            f.write(f"  Training Curves: models/facenet_models/training_curves.png\n")
-            f.write(f"  Confusion Matrix: models/facenet_models/confusion_matrix_test.png\n")
-            f.write(f"  Class Accuracy: models/facenet_models/class_accuracy_test.png\n")
+            f.write(f"  Models: {self.model_save_dir}/\n")
+            f.write(f"  Test Results: {self.model_save_dir}/test_results/\n")
+            f.write(f"  Training Curves: {self.model_save_dir}/training_curves.png\n")
+            f.write(f"  Confusion Matrix: {self.model_save_dir}/confusion_matrix_test.png\n")
+            f.write(f"  Class Accuracy: {self.model_save_dir}/class_accuracy_test.png\n")
         
         print(f"📋 Final evaluation summary saved: {summary_file}")
+
+def create_latest_symlink(timestamped_dir, base_output_dir):
+    """
+    Buat symlink 'latest' yang menunjuk ke training terbaru
+    
+    Args:
+        timestamped_dir: Directory training dengan timestamp
+        base_output_dir: Base directory
+    """
+    try:
+        base_path = Path(base_output_dir)
+        latest_link = base_path / 'latest'
+        
+        # Hapus symlink lama jika ada
+        if latest_link.exists() or latest_link.is_symlink():
+            latest_link.unlink()
+        
+        # Buat symlink baru
+        latest_link.symlink_to(timestamped_dir.name)
+        print(f"🔗 Symlink 'latest' dibuat: {latest_link} -> {timestamped_dir.name}")
+        
+    except Exception as e:
+        print(f"⚠️  Tidak bisa membuat symlink 'latest': {e}")
 
 def main():
     # Override global variables jika ada argument
@@ -916,7 +960,15 @@ def main():
         print(f"\n🎯 Training Summary:")
         print(f"   📊 Best Validation Accuracy: {best_accuracy:.2f}%")
         print(f"   💾 Models saved in: {args.output}")
-        print(f"   �� Training curves: {args.output}/training_curves.png")
+        print(f"   📊 Training curves: {args.output}/training_curves.png")
+        
+        # Buat symlink ke training terbaru
+        create_latest_symlink(trainer.model_save_dir, args.output)
+        
+        print(f"\n📁 Training Results Location:")
+        print(f"   🎯 Current Training: {trainer.model_save_dir}")
+        print(f"   🔗 Latest Symlink: {args.output}/latest")
+        print(f"   📋 Quick Access: {trainer.model_save_dir}/best_facenet.pth")
         
     except RuntimeError as e:
         print(f"❌ Error: {e}")
