@@ -137,107 +137,48 @@ class FaceBodyDetectionInference:
         return detections
     
     def calculate_density(self, faces, bodies, image_shape):
-        """Calculate crowd density analysis"""
+        """Calculate crowd density analysis based on people count"""
         h, w = image_shape[:2]
         total_area = h * w
         
-        # Jumlah orang (berdasarkan body detection yang lebih akurat untuk counting)
+        # Jumlah orang (berdasarkan body detection)
         num_people = len(bodies)
         
-        # Density berdasarkan jumlah orang per area (orang per 1000 pixel²)
-        people_density = (num_people / total_area) * 1000000  # per million pixels
+        # Simple density: jumlah orang per area
+        people_density = num_people / (total_area / 1000000)  # orang per juta pixel
         
-        # Spatial distribution analysis
-        spatial_density = self._calculate_spatial_density(bodies, image_shape)
+        # Crowd level berdasarkan jumlah orang
+        if num_people == 0:
+            crowd_level = "Empty"
+            crowd_intensity = 0
+        elif num_people <= 2:
+            crowd_level = "Low"
+            crowd_intensity = 25
+        elif num_people <= 5:
+            crowd_level = "Medium"
+            crowd_intensity = 50
+        elif num_people <= 10:
+            crowd_level = "High"
+            crowd_intensity = 75
+        else:
+            crowd_level = "Very High"
+            crowd_intensity = 100
         
-        # Crowd level analysis berdasarkan jumlah orang dan distribusi
-        crowd_level, crowd_intensity = self._determine_crowd_level(num_people, spatial_density)
-        
-        # Face-to-body ratio (untuk analisis kualitas deteksi)
+        # Face-to-body ratio
         face_body_ratio = len(faces) / num_people if num_people > 0 else 0
+        
+        # Area coverage
+        area_coverage = self._calculate_area_coverage(bodies, total_area)
         
         return {
             'people_count': num_people,
             'face_count': len(faces),
-            'people_density': people_density,  # orang per million pixels
-            'spatial_density': spatial_density,  # distribusi spasial
+            'people_density': people_density,
             'crowd_level': crowd_level,
-            'crowd_intensity': crowd_intensity,  # 0-100 scale
+            'crowd_intensity': crowd_intensity,
             'face_body_ratio': face_body_ratio,
-            'area_coverage': self._calculate_area_coverage(bodies, total_area)
+            'area_coverage': area_coverage
         }
-    
-    def _calculate_spatial_density(self, bodies, image_shape):
-        """Calculate spatial distribution of people"""
-        if len(bodies) == 0:
-            return 0.0
-        
-        h, w = image_shape[:2]
-        
-        # Bagi image menjadi grid 4x4 untuk analisis distribusi
-        grid_h, grid_w = h // 4, w // 4
-        grid_counts = np.zeros((4, 4))
-        
-        # Hitung jumlah orang di setiap grid
-        for body in bodies:
-            x1, y1, x2, y2 = body['bbox']
-            center_x, center_y = (x1 + x2) // 2, (y1 + y2) // 2
-            
-            grid_x = min(center_x // grid_w, 3)
-            grid_y = min(center_y // grid_h, 3)
-            grid_counts[grid_y, grid_x] += 1
-        
-        # Hitung variance untuk menentukan seberapa merata distribusinya
-        # Variance tinggi = clustering, variance rendah = distribusi merata
-        occupied_grids = np.count_nonzero(grid_counts)
-        if occupied_grids == 0:
-            return 0.0
-        
-        # Spatial density score: kombinasi dari jumlah orang dan distribusi
-        avg_people_per_occupied_grid = np.sum(grid_counts) / occupied_grids
-        distribution_score = occupied_grids / 16.0  # normalized by total grids
-        
-        # Spatial density: lebih tinggi jika banyak orang dan terdistribusi
-        spatial_density = avg_people_per_occupied_grid * distribution_score
-        
-        return spatial_density
-    
-    def _determine_crowd_level(self, num_people, spatial_density):
-        """Determine crowd level and intensity"""
-        # Base crowd level berdasarkan jumlah orang
-        if num_people == 0:
-            base_level = "Empty"
-            base_intensity = 0
-        elif num_people <= 2:
-            base_level = "Low"
-            base_intensity = 20
-        elif num_people <= 5:
-            base_level = "Medium"
-            base_intensity = 40
-        elif num_people <= 10:
-            base_level = "High"
-            base_intensity = 70
-        else:
-            base_level = "Very High"
-            base_intensity = 90
-        
-        # Adjust berdasarkan spatial density
-        spatial_factor = min(spatial_density / 2.0, 1.0)  # normalize spatial factor
-        adjusted_intensity = min(base_intensity + (spatial_factor * 20), 100)
-        
-        # Refined crowd level berdasarkan adjusted intensity
-        if adjusted_intensity == 0:
-            final_level = "Empty"
-        elif adjusted_intensity <= 25:
-            final_level = "Low"
-        elif adjusted_intensity <= 50:
-            final_level = "Medium"
-        elif adjusted_intensity <= 75:
-            final_level = "High"
-        else:
-            final_level = "Very High"
-        
-        return final_level, adjusted_intensity
     
     def _calculate_area_coverage(self, bodies, total_area):
         """Calculate percentage of area covered by people"""
@@ -311,9 +252,8 @@ class FaceBodyDetectionInference:
             f"Faces: {len(faces)} | Bodies: {len(bodies)}",
             f"Crowd Level: {density_info['crowd_level']} ({density_info['crowd_intensity']}%)",
             f"People Density: {density_info['people_density']:.1f}/Mpx",
-            f"Spatial Density: {density_info['spatial_density']:.2f}",
             f"Area Coverage: {density_info['area_coverage']:.1f}%",
-            f"Face/Body Ratio: {density_info['face_body_ratio']:.2f}"
+            f"Face-to-Body Ratio: {density_info['face_body_ratio']:.2f}"
         ]
         
         for i, text in enumerate(texts):
@@ -359,7 +299,7 @@ class FaceBodyDetectionInference:
         # Print results
         print(f"✅ Detected {len(faces)} faces, {len(bodies)} bodies")
         print(f"📊 Crowd Level: {density_info['crowd_level']}")
-        print(f"📈 Densities - People: {density_info['people_density']:.1f} orang/juta pixel, Spatial: {density_info['spatial_density']:.2f}")
+        print(f"📈 Densities - People: {density_info['people_density']:.1f} orang/juta pixel")
         print(f"📈 Intensity: {density_info['crowd_intensity']}%")
         print(f"📈 Face-to-Body Ratio: {density_info['face_body_ratio']:.2f}")
         print(f"📈 Area Coverage: {density_info['area_coverage']:.1f}%")
