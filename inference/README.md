@@ -11,12 +11,79 @@ inference/
 ├── facenet_inference.py           # FaceNet inference murni
 ├── demo_tracking.py               # Demo tracking dengan output file
 ├── realtime_tracking.py          # Real-time tracking dengan webcam
-└── body_detection_inference.py    # Body detection dengan YOLO pre-trained
+├── body_detection_inference.py    # Body detection dengan YOLO pre-trained
+└── face_body_detection_inference.py # Face + Body detection dengan analisis kepadatan
 ```
 
 ## 🎯 Script Utama
 
-### 1. **facenet_yolo_inference.py** - YOLO + FaceNet Inference
+### 1. **face_body_detection_inference.py** - Face + Body Detection dengan Analisis Kepadatan
+
+Script yang menggabungkan deteksi wajah dan body dengan analisis kepadatan crowd.
+
+#### **Overview**
+Sistem dual detection yang menggabungkan:
+- **Face Detection**: YOLO fine-tuned model untuk deteksi wajah
+- **Body Detection**: YOLO pre-trained model (COCO) untuk deteksi body
+- **Density Analysis**: Analisis kepadatan dan statistik crowd
+
+#### **Fitur Utama**
+- 🎯 **Dual Detection**: Deteksi wajah dan body secara bersamaan
+- 📊 **Density Analysis**: Analisis kepadatan area dan crowd level
+- 📈 **Statistics**: Statistik lengkap per frame dan keseluruhan
+- ⚡ **TensorRT Support**: Support untuk kedua model
+- 🎨 **Visual Output**: Bounding box berbeda warna untuk face (biru) dan body (hijau)
+- 💾 **Export Stats**: Export statistik ke file JSON
+
+#### **Crowd Level Classification**
+- **Empty**: 0 orang
+- **Low**: 1-2 orang
+- **Medium**: 3-5 orang
+- **High**: 6-10 orang
+- **Very High**: >10 orang
+
+**Usage:**
+
+```bash
+# Basic Image Processing
+python face_body_detection_inference.py \
+  --face-model ../models/YOLO12n_finetuned/weights/best.pt \
+  --body-model ../models/YOLO12n_pretrained/yolo12n.pt \
+  --mode image \
+  --input ../test/images/sample.jpg \
+  --output ../face_body_result.jpg \
+  --show
+
+# Video Processing dengan TensorRT dan Statistics
+python face_body_detection_inference.py \
+  --face-model ../models/YOLO12n_finetuned/weights/best.engine \
+  --body-model ../models/YOLO12n_pretrained/yolo12n.engine \
+  --mode video \
+  --input ../video.mp4 \
+  --output ../face_body_result.mp4 \
+  --use-tensorrt \
+  --save-stats \
+  --face-conf 0.5 \
+  --body-conf 0.5
+```
+
+**Parameters:**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--face-model` | Required | Path ke YOLO face detection model |
+| `--body-model` | yolo12n.pt | Path ke YOLO body detection model |
+| `--mode` | image | Mode: image atau video |
+| `--input` | Required | Input file path |
+| `--output` | Optional | Output file path |
+| `--face-conf` | 0.5 | Face detection confidence threshold |
+| `--body-conf` | 0.5 | Body detection confidence threshold |
+| `--show` | False | Display results |
+| `--device` | Auto | Device: cuda atau cpu |
+| `--use-tensorrt` | False | Enable TensorRT acceleration |
+| `--save-stats` | False | Save statistics to JSON file |
+
+### 2. **facenet_yolo_inference.py** - YOLO + FaceNet Inference
 
 Script utama yang menggabungkan YOLO untuk face detection dan FaceNet untuk face recognition.
 
@@ -116,7 +183,7 @@ python facenet_yolo_inference.py \
 | `--device` | Auto | Device: cuda atau cpu |
 | `--show` | False | Display results |
 
-### 2. **body_detection_inference.py** - Body Detection dengan YOLO Pre-trained
+### 3. **body_detection_inference.py** - Body Detection dengan YOLO Pre-trained
 
 Script untuk body detection menggunakan YOLO12n pre-trained model dengan COCO dataset.
 
@@ -175,7 +242,7 @@ python body_detection_inference.py \
 | `--device` | Auto | Device: cuda atau cpu |
 | `--use-tensorrt` | False | Enable TensorRT acceleration |
 
-### 3. **facenet_inference.py** - FaceNet Pure Recognition
+### 4. **facenet_inference.py** - FaceNet Pure Recognition
 
 Script untuk inference FaceNet murni dengan MTCNN face detection.
 
@@ -204,7 +271,7 @@ python facenet_inference.py \
   --camera 0
 ```
 
-### 4. **demo_tracking.py** - Demo dengan Output File
+### 5. **demo_tracking.py** - Demo dengan Output File
 
 Script demo untuk testing model dengan berbagai mode tanpa display (headless).
 
@@ -228,7 +295,7 @@ python demo_tracking.py \
   --runtime tensorrt
 ```
 
-### 5. **realtime_tracking.py** - Real-time Webcam Tracking
+### 6. **realtime_tracking.py** - Real-time Webcam Tracking
 
 Script untuk real-time object tracking menggunakan webcam.
 
@@ -266,24 +333,20 @@ Semua script menggunakan relative paths dari direktori `inference/`:
 
 ```
 ../models/
-├── YOLO12n/weights/
-│   ├── best.pt          # PyTorch model (custom trained)
-│   └── best.engine      # TensorRT engine
-├── YOLO12s/weights/best.pt
-├── YOLOv12m/weights/best.pt
-├── YOLOv12l/weights/best.pt
-├── YOLOv12x/weights/best.pt
-├── pretrained/          # COCO pre-trained models
-│   ├── yolo12n.pt       # Body detection
-│   ├── yolo12s.pt
-│   └── yolo12m.pt
+├── YOLO12n_finetuned/weights/
+│   ├── best.pt          # PyTorch model (face detection)
+│   └── best.engine      # TensorRT engine (face detection)
+├── YOLO12n_pretrained/
+│   ├── yolo12n.pt       # PyTorch model (body detection)
+│   └── yolo12n.engine   # TensorRT engine (body detection)
+├── YOLO12s_finetuned/weights/best.pt
+├── YOLOv12m_finetuned/weights/best.pt
+├── YOLOv12l_finetuned/weights/best.pt
+├── YOLOv12x_finetuned/weights/best.pt
 └── facenet_models/
-    ├── latest/          # Symlink ke training terbaru
-    │   ├── best_facenet.pth
-    │   └── class_mapping.pkl
-    └── training_YYYYMMDD_HHMMSS/
-        ├── best_facenet.pth
-        └── class_mapping.pkl
+    ├── README.md            # Download instructions
+    ├── best_facenet.pth     # FaceNet model (download required)
+    └── class_mapping.pkl    # Class mapping file
 ```
 
 ## ⚡ TensorRT Support
